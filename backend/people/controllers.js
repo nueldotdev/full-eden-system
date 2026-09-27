@@ -52,4 +52,5 @@ const handleAddPeople = async (req, res) => {
 
 module.exports = {
   handleGetPeople,
+  handleAddPeople
 };  
