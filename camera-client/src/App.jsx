@@ -1,16 +1,15 @@
-import CameraFoundation from "./components/CameraFoundation";
-import { mockRule } from "./config/mockRule";
+import CameraView from "./components/CameraView";
+import { mockRule } from "./config/mockrule";
 
 export default function App() {
   const handleMatch = (frame, match) => {
     console.log("MATCH:", match.label, match.confidence);
-    // swap this for Dev B's real function once you have it
+    // TODO: replace with Dev B's real handoff once confirmed
   };
 
   return (
-    <div>
-      <h1>Project Eden — Camera Foundation</h1>
-      <CameraFoundation rule={mockRule} onMatch={handleMatch} />
+    <div style={{ background: "#000", minHeight: "100vh", padding: "20px" }}>
+      <CameraView rule={mockRule} onMatch={handleMatch} />
     </div>
   );
 }
