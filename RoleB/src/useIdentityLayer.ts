@@ -27,9 +27,8 @@ interface UseIdentityLayerOptions {
   }>;
   /** Called once identity is resolved for a Gate-2-matched frame — hands off to the backend's evaluate_frame route. */
   onIdentifiedFrame: (payload: {
-    imageBlob: Blob;
-    matchedPersonId: string | null; // stable internal ID for the matched person
-    matchedPersonName: string | null; // user-facing display name for the matched person
+    descriptor: number[];
+    matchedPersonId: string | null;
     distance: number | null;
     timestamp: number;
   }) => void;
@@ -160,8 +159,9 @@ export function useIdentityLayer({
 
       const matchedPersonName =
         matchedPersonId !== null
-          ? enrolledCacheRef.current.find((person) => person.id === matchedPersonId)
-              ?.name ?? matchedPersonId
+          ? (enrolledCacheRef.current.find(
+              (person) => person.id === matchedPersonId,
+            )?.name ?? matchedPersonId)
           : null;
 
       // Lower distance means the live face is closer to that enrolled face.
@@ -176,11 +176,9 @@ export function useIdentityLayer({
       if (now - lastFired < cooldownMs) return;
       cooldownRef.current.set(cooldownKey, now);
 
-      const imageBlob = await captureFrameAsBlob(video);
       onIdentifiedFrame({
-        imageBlob,
+        descriptor: Array.from(result.descriptor),
         matchedPersonId,
-        matchedPersonName,
         distance,
         timestamp: now,
       });
