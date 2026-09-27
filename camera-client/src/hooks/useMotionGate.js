@@ -28,7 +28,14 @@ export function useMotionGate() {
     const changeRatio = diffFrames(lastFrameRef.current, currentFrame);
     lastFrameRef.current = currentFrame;
 
-    return { motionDetected: changeRatio > 0.02, changeRatio };
+    const motionDetected = changeRatio > 0.01;
+    if (motionDetected) {
+      console.log(
+        `[MotionGate] Motion detected! changeRatio: ${(changeRatio * 100).toFixed(2)}%`
+      );
+    }
+
+    return { motionDetected, changeRatio };
   };
 
   return { checkMotion };

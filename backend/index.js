@@ -13,6 +13,7 @@ const supabase = createClient(
 const ruleRoutes = require("./rules/routes");
 const intelligenceRoutes = require("./intelligence/routes");
 const peopleRoutes = require("./people/routes")
+const syncRoutes = require("./sync/routes");
 
 const app = express();
 const port = 4001;
