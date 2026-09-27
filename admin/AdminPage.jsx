@@ -100,17 +100,43 @@ export default function EdenVisionDashboard() {
     };
   }, []);
 
-  const handleUpdateRule = () => {
-    if (!ruleText.trim()) {
+  const handleUpdateRule = async () => {
+    const rule = ruleText.trim();
+
+    if (!rule) {
       setRuleText(
         "Alert if someone is carrying a red bag or red backpack into the lobby",
       );
+      return;
     }
-    setUpdating(true);
-    setTimeout(() => {
-      setUpdating(false);
+
+    try {
+      setUpdating(true);
+
+      const response = await fetch("http://localhost:4001/create_rule", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          rule,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Create rule failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      console.log("Eden: rule created successfully", data);
+
       showToast();
-    }, 600);
+    } catch (error) {
+      console.error("Eden: failed to create rule", error);
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const handleRefreshFrame = () => {

@@ -24,12 +24,12 @@ app.use('/api/ai', intelligenceRoutes)
 
 app.listen(port, async () => {
   try {
-    // const { error } = await supabase.from("rules").select("*").limit(1);
-    // if (error) {
-    //   console.error("❌ Failed to connect to Supabase:", error.message);
-    //   return;
-    // }
-    // console.log("✅ Connected to Supabase successfully");
+    const { error } = await supabase.from("rules").select("*").limit(1);
+    if (error) {
+      console.error("❌ Failed to connect to Supabase:", error.message);
+      return;
+    }
+    console.log("✅ Connected to Supabase successfully");
     console.log(`Example app listening on port http://localhost:${port}`);
   } catch (err) {
     console.error("❌ Error connecting to Supabase:", err.message);

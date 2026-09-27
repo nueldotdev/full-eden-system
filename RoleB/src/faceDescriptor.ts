@@ -14,7 +14,7 @@ import { loadFaceModels, detectorOptions } from "./faceModels";
 /** A descriptor as it travels over the wire / sits in the cache — plain, JSON-safe. */
 export type SerializedDescriptor = number[];
 
-export interface EnrolledPerson {
+export interface EnrolledPerson  {
   id: string;
   name: string;
   descriptors: SerializedDescriptor[]; // one person can have >1 reference photo
