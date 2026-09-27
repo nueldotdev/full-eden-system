@@ -12,6 +12,7 @@ const supabase = createClient(
 
 const ruleRoutes = require("./rules/routes");
 const intelligenceRoutes = require("./intelligence/routes");
+const peopleRoutes = require("./people/routes")
 
 const app = express();
 const port = 4001;
@@ -20,7 +21,8 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/rule", ruleRoutes);
-app.use('/api/ai', intelligenceRoutes)
+app.use('/api/ai', intelligenceRoutes);
+app.use("api/people", peopleRoutes)
 
 app.listen(port, async () => {
   try {
