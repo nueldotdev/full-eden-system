@@ -48,23 +48,21 @@ export function IdentityLayerExample() {
   }, [enrolled]);
 
   async function sendToBackend(payload: {
-    imageBlob: Blob;
+    descriptor: number[];
     matchedPersonId: string | null;
-    matchedPersonName: string | null;
     distance: number | null;
     timestamp: number;
   }) {
     console.log("Identity result:", {
       matchedPersonId: payload.matchedPersonId,
-      matchedPersonName: payload.matchedPersonName,
       distance: payload.distance,
       timestamp: payload.timestamp,
-      imageSize: payload.imageBlob.size,
+      descriptorLength: payload.descriptor.length,
     });
 
-    if (payload.matchedPersonName) {
+    if (payload.matchedPersonId) {
       setMessage(
-        `Identity matched: ${payload.matchedPersonName} (distance: ${payload.distance?.toFixed(3)})`,
+        `Identity matched: ${payload.matchedPersonId} (distance: ${payload.distance?.toFixed(3)})`,
       );
     } else {
       setMessage("No enrolled identity matched this face.");
