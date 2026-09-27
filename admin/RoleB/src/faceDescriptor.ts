@@ -14,7 +14,7 @@ import { loadFaceModels, detectorOptions } from "./faceModels";
 /** A descriptor as it travels over the wire / sits in the cache — plain, JSON-safe. */
 export type SerializedDescriptor = number[];
 
-export interface EnrolledPerson  {
+export interface EnrolledPerson {
   id: string;
   name: string;
   descriptors: SerializedDescriptor[]; // one person can have >1 reference photo
@@ -46,13 +46,20 @@ export async function photoToDescriptor(
   return Array.from(result.descriptor);
 }
 /** Convenience: load an image from a File (e.g. straight from an <input type="file">). */
+// faceDescriptor.ts
 export function fileToImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve(img);
+    img.onload = async () => {
+      try {
+        await img.decode(); // ensures pixel data is fully ready
+        URL.revokeObjectURL(url);
+        resolve(img);
+      } catch (err) {
+        URL.revokeObjectURL(url);
+        reject(err);
+      }
     };
     img.onerror = (err) => {
       URL.revokeObjectURL(url);
@@ -61,7 +68,6 @@ export function fileToImage(file: File): Promise<HTMLImageElement> {
     img.src = url;
   });
 }
-
 /**
  * Builds a FaceMatcher from the enrolled set (as cached locally by the
  * identity layer). Rebuild this whenever the cache is diffed and

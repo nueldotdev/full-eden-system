@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./AdminPage.css";
+import { apiFetch } from "../backend/people/client";
+import { photoToDescriptor, fileToImage } from "./RoleB/src/faceDescriptor";
 import {
   Bell,
   Zap,
@@ -65,6 +67,10 @@ const FILTERS = ["All (2)", "Critical (1)", "Review Needed"];
 /* ------------------------------------------------------------------ */
 
 export default function EdenVisionDashboard() {
+  const [personId, setPersonId] = useState("");
+  const [personName, setPersonName] = useState("");
+  const [descriptor, setDescriptor] = useState(null);
+  const [enrolling, setEnrolling] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [isDark, setIsDark] = useState(true);
@@ -102,40 +108,53 @@ export default function EdenVisionDashboard() {
 
   const handleUpdateRule = async () => {
     const rule = ruleText.trim();
-
-    if (!rule) {
-      setRuleText(
-        "Alert if someone is carrying a red bag or red backpack into the lobby",
-      );
-      return;
-    }
+    if (!rule) return alert("Please enter a rule");
 
     try {
       setUpdating(true);
-
-      const response = await fetch("http://localhost:4001/create_rule", {
+      const data = await apiFetch("/api/rule/create_rule", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          rule,
-        }),
+        body: JSON.stringify({ rule_text: rule }),
       });
-
-      if (!response.ok) {
-        throw new Error(`Create rule failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      console.log("Eden: rule created successfully", data);
-
+      console.log("Rule created successfully:", data);
       showToast();
     } catch (error) {
-      console.error("Eden: failed to create rule", error);
+      console.error("Failed to create rule:", error);
+      alert(error.message || "Failed to create rule");
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleAddPerson = async () => {
+    if (!personId.trim()) return alert("Enter a person ID");
+    if (!personName.trim()) return alert("Enter a person name");
+    if (!descriptor)
+      return alert("Upload an image with a detectable face first");
+
+    try {
+      setEnrolling(true);
+      const result = await apiFetch("/api/people/add_people", {
+        // <-- corrected path
+        method: "POST",
+        body: JSON.stringify({
+          id: personId.trim(),
+          name: personName.trim(),
+          descriptors: [descriptor],
+        }),
+      });
+      console.log("Person added successfully:", result);
+      alert("Person enrolled successfully");
+      setPersonId("");
+      setPersonName("");
+      setDescriptor(null);
+      setUploadedImage(null);
+      setShowUploadModal(false);
+    } catch (error) {
+      console.error("Failed to add person:", error);
+      alert(error.message || "Failed to add person");
+    } finally {
+      setEnrolling(false);
     }
   };
 
@@ -143,17 +162,41 @@ export default function EdenVisionDashboard() {
     setTimestampLabel("Refreshing frame...");
     setTimeout(() => setTimestampLabel("Updated just now"), 500);
   };
-  const handleImageUpload = (event) => {
+  const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
 
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
+      console.error("Please select an image");
       return;
     }
 
-    const imageUrl = URL.createObjectURL(file);
-    setUploadedImage(imageUrl);
+    try {
+      setEnrolling(true);
+
+      // Show image preview
+      const imageUrl = URL.createObjectURL(file);
+      setUploadedImage(imageUrl);
+
+      // Convert image to HTMLImageElement
+      const image = await fileToImage(file);
+
+      // Generate face descriptor
+      const faceDescriptor = await photoToDescriptor(image);
+
+      console.log("Face descriptor:", faceDescriptor);
+
+      setDescriptor(faceDescriptor);
+    } catch (error) {
+      console.error("Failed to generate face descriptor:", error);
+
+      alert(error.message || "Could not detect a face in this image.");
+
+      setDescriptor(null);
+    } finally {
+      setEnrolling(false);
+    }
   };
   return (
     <div className={`eden-root ${isDark ? "eden-dark" : "eden-light"}`}>
@@ -210,6 +253,23 @@ export default function EdenVisionDashboard() {
                 className="eden-upload-modal"
                 onClick={(e) => e.stopPropagation()}
               >
+                <div className="eden-person-fields">
+                  <input
+                    type="text"
+                    placeholder="Person ID"
+                    value={personId}
+                    onChange={(e) => setPersonId(e.target.value)}
+                    className="eden-person-input"
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Person name"
+                    value={personName}
+                    onChange={(e) => setPersonName(e.target.value)}
+                    className="eden-person-input"
+                  />
+                </div>
                 <div className="eden-upload-header">
                   <div>
                     <h3 className="eden-upload-title">Upload Image</h3>
@@ -270,13 +330,12 @@ export default function EdenVisionDashboard() {
                     <button
                       type="button"
                       className="eden-acknowledge-button"
-                      onClick={() => {
-                        setShowUploadModal(false);
-                        showToast();
-                      }}
+                      onClick={handleAddPerson}
+                      disabled={enrolling || !descriptor}
                     >
                       <Upload size={17} />
-                      Use Image
+
+                      {enrolling ? "Enrolling..." : "Add Person"}
                     </button>
                   </div>
                 )}
@@ -390,7 +449,9 @@ export default function EdenVisionDashboard() {
             <div className="eden-primary-action-block">
               <button
                 type="button"
-                className={`eden-primary-button ${updating ? "eden-primary-button-busy" : ""}`}
+                className={`eden-primary-button ${
+                  updating ? "eden-primary-button-busy" : ""
+                }`}
                 onClick={handleUpdateRule}
               >
                 <span className="eden-primary-button-icon">⟳</span>

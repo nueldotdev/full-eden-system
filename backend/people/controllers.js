@@ -1,19 +1,19 @@
+// backend/people/controllers.js
+const { createClient } = require("@supabase/supabase-js"); // was missing entirely
 
-// const data = {
-//   id,
-//   name,
-//   descriptor_id
-// }
-
+const dbAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY
+);
+const dbClient = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_PUBLISHABLE_KEY
+);
 
 const handleGetPeople = async (req, res) => {
   try {
-    const { data, error } = await dbClient
-      .from("people")
-      .select("*");
-
+    const { data, error } = await dbClient.from("people").select("*");
     if (error) throw error;
-
     return res.status(200).json(data);
   } catch (error) {
     console.log(error);
@@ -21,22 +21,17 @@ const handleGetPeople = async (req, res) => {
   }
 };
 
-
 const handleAddPeople = async (req, res) => {
-  const { data } = req.body;
+  const { id, name, descriptors } = req.body;
 
-  if (!data) {
-    return res.status(400).json({ message: "Missing data" });
+  if (!id || !name || !Array.isArray(descriptors) || descriptors.length === 0) {
+    return res.status(400).json({ message: "Missing id, name, or descriptors" });
   }
 
   try {
     const { data, error } = await dbAdmin
       .from("people")
-      .insert({
-        id: data.id,
-        name: data.name,
-        descriptors: data.descriptors
-      })
+      .insert({ id, name, descriptors })
       .select();
 
     if (error) throw error;
@@ -46,11 +41,6 @@ const handleAddPeople = async (req, res) => {
     console.log(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
-
-
-module.exports = {
-  handleGetPeople,
-  handleAddPeople
-};  
+module.exports = { handleGetPeople, handleAddPeople };

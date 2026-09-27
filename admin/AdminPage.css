@@ -1459,6 +1459,63 @@
   gap: 10px;
   margin-top: 18px;
 }
+/* Person enrollment inputs */
+.eden-person-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.eden-person-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+
+  font-size: 14px;
+  font-family: inherit;
+
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.eden-person-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.eden-person-input:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.eden-person-input:focus {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14);
+}
+
+.eden-person-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .eden-person-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .eden-reasoning-text {
   margin: 0;
   font-size: 11.5px;
