@@ -35,7 +35,40 @@ Rule: "${ruleText}"`,
   });
 };
 
+const evaluateFrame = (ruleText, identityContext, base64Image) => {
+  return Gemini.interactions.create({
+    model: "gemini-3.8-flash",
+    input: [
+      {
+        type: "text",
+        text: `Rule: ${ruleText}
+Identity context: ${identityContext}
+
+Does this image satisfy the rule? Respond with a verdict and a short reason.`,
+      },
+      {
+        type: "image",
+        data: base64Image,
+        mime_type: "image/jpeg",
+      },
+    ],
+    response_format: {
+      type: "text",
+      mime_type: "application/json",
+      schema: {
+        type: "object",
+        properties: {
+          match: { type: "boolean" },
+          reason: { type: "string" },
+        },
+        required: ["match", "reason"],
+      },
+    },
+  });
+};
+
 module.exports = {
   Gemini,
   generateSubConditions,
+  evaluateFrame,
 };

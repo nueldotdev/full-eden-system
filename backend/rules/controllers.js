@@ -20,7 +20,7 @@ const handleGetActiveRule = async (req, res) => {
       .eq("active", true)
       .single();
 
-    if (data.length < 1) return res.status(404).json({ message: "No active rule found" });
+    if (!data) return res.status(404).json({ message: "No active rule found" });
 
     if (error) throw error;
 
@@ -32,14 +32,22 @@ const handleGetActiveRule = async (req, res) => {
 };
 
 const handlePostRule = async (req, res) => {
-  const { rule } = req.body;
+  const { rule_text } = req.body;
 
-  if (!rule) {
-    return res.status(400).json({ message: "Missing rule" });
+  if (!rule_text) {
+    return res.status(400).json({ message: "Missing rule text" });
   }
 
   try {
-    const subConditions = await generateSubConditions(rule);
+    const subConditions = await generateSubConditions(rule_text);
+
+    const { error: deactivateError } = await dbAdmin
+      .from("rules")
+      .update({ active: false })
+      .eq("active", true);
+
+    if (deactivateError) throw deactivateError;
+
     const { data, error } = await dbAdmin
       .from("rules")
       .insert({
