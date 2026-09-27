@@ -31,11 +31,30 @@ export default function CameraFoundation({ rule, onMatch }) {
     return ctx.getImageData(0, 0, canvas.width, canvas.height);
   };
 
+  const drawBox = (match) => {
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext("2d");
+
+  const { x, y, width, height, label, confidence } = match;
+
+  ctx.strokeStyle = "#00ff00";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x, y, width, height);
+
+  ctx.fillStyle = "#00ff00";
+  ctx.font = "16px sans-serif";
+  ctx.fillText(
+    `${label} (${(confidence * 100).toFixed(0)}%)`,
+    x,
+    y > 20 ? y - 8 : y + 20
+  );
+};
+
   useEffect(() => {
     const interval = setInterval(async () => {
       if (!ready) return;
 
-      const frame = captureFrame();
+      const frame = captureFrame(); // this also redraws the plain video frame each cycle
       if (!frame) return;
 
       const { motionDetected } = checkMotion(frame);
@@ -43,6 +62,8 @@ export default function CameraFoundation({ rule, onMatch }) {
 
       const match = await detectAndMatch(videoRef.current);
       if (!match) return;
+
+      drawBox(match); // draw the box regardless of cooldown, so it's visually live
 
       if (!canFire(match.label)) return;
 
@@ -54,14 +75,11 @@ export default function CameraFoundation({ rule, onMatch }) {
 
   return (
     <div>
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        playsInline
+      <video ref={videoRef} autoPlay muted playsInline style={{ display: "none" }} />
+      <canvas
+        ref={canvasRef}
         style={{ width: "480px", border: "2px solid black" }}
       />
-      <canvas ref={canvasRef} style={{ display: "none" }} />
       <p>{ready ? "Model ready" : "Loading model..."}</p>
     </div>
   );
