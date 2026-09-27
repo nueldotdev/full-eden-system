@@ -56,28 +56,32 @@ export default function CameraView({ rule, onMatch }) {
 
   useEffect(() => {
     const interval = setInterval(async () => {
+      console.log("CameraView interval tick — ready:");
       if (!ready) {
+        console.log("CameraView interval tick — ready: -2")
         setStatusText("Loading model...");
         return;
       }
 
       const frame = captureFrame();
+      console.log("CameraView interval tick — ready: -3")
       if (!frame) return;
 
       const { motionDetected } = checkMotion(frame);
       setStatusText(
-        motionDetected ? "ANALYZING FEED • MOTION DETECTED" : "MONITORING • NO MOTION"
+        motionDetected ? "ANALYZING FEED • MOTION" : "MONITORING • NO MOTION"
       );
 
       if (!motionDetected) return;
 
       const match = await detectAndMatch(videoRef.current, frame);
+      console.log("CameraView interval tick — ready: -4")
       if (!match) return;
 
       drawBox(match);
       setLastDetection(match);
 
-      if (!canFire(match.label)) return;
+      if (!canFire(match.label)) console.log("CameraView interval tick — ready: FAIL");
 
       onMatch(frame, match); // handoff to Dev B
     }, 400);
