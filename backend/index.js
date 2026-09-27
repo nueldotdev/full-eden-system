@@ -33,6 +33,7 @@ app.use((req, res, next) => {
 app.use("/api/rule", ruleRoutes);
 app.use("/api/ai", intelligenceRoutes);
 app.use("/api/people", peopleRoutes);
+app.use('/api/sync', syncRoutes);
 
 app.listen(port, async () => {
   try {
