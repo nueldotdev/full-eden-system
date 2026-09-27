@@ -1,16 +1,7 @@
 // NOTE: NO API KEY FROM THE REQUESTS COMING IN, ONLY KEY IS SUPERBASE
-const { createClient } = require("@supabase/supabase-js");
-const { generateSubConditions } = require("../ai-utils/aiSetup");
+const { dbAdmin, dbClient } = require("../utils/supabase");
+const { generateSubConditions } = require("../utils/aiSetup");
 
-const dbAdmin = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SECRET_KEY
-);
-
-const dbClient = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_PUBLISHABLE_KEY
-);
 
 const handleGetActiveRule = async (req, res) => {
   try {
@@ -57,7 +48,6 @@ const handlePostRule = async (req, res) => {
       })
       .select();
 
-
     if (error) throw error;
 
     return res.status(201).json(data);
@@ -66,8 +56,6 @@ const handlePostRule = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
-
 
 module.exports = {
   handleGetActiveRule,

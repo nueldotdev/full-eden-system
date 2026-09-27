@@ -1,9 +1,4 @@
-
-// const data = {
-//   id,
-//   name,
-//   descriptor_id
-// }
+const { dbAdmin, dbClient } = require("../utils/supabase");
 
 
 const handleGetPeople = async (req, res) => {
