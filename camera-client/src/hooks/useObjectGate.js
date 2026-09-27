@@ -166,6 +166,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as ml5 from "ml5";
+import { detectDominantColor } from "../utils/colorDetect";
 
 export function useObjectGate(rule) {
   const detectorRef = useRef(null);
@@ -177,7 +178,8 @@ export function useObjectGate(rule) {
     });
   }, []);
 
-  const detectAndMatch = (videoEl) => {
+  // now also takes the current frame's ImageData, so we can sample color
+  const detectAndMatch = (videoEl, frameImageData) => {
     return new Promise((resolve) => {
       if (!ready || !videoEl) return resolve(null);
 
