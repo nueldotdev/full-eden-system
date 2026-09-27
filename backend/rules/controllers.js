@@ -40,6 +40,14 @@ const handlePostRule = async (req, res) => {
 
   try {
     const subConditions = await generateSubConditions(rule_text);
+
+    const { error: deactivateError } = await dbAdmin
+      .from("rules")
+      .update({ active: false })
+      .eq("active", true);
+
+    if (deactivateError) throw deactivateError;
+
     const { data, error } = await dbAdmin
       .from("rules")
       .insert({
