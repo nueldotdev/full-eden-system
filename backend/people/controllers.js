@@ -3,7 +3,7 @@ const { dbAdmin, dbClient } = require("../utils/supabase");
 
 const handleGetPeople = async (req, res) => {
   try {
-    const { data, error } = await dbClient
+    const { data, error } = await dbAdmin
       .from("people")
       .select("*");
 

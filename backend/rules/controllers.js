@@ -5,15 +5,17 @@ const { generateSubConditions } = require("../utils/aiSetup");
 
 const handleGetActiveRule = async (req, res) => {
   try {
-    const { data, error } = await dbClient
+    const { data, error } = await dbAdmin
       .from("rules")
       .select("*")
       .eq("active", true)
-      .single();
-
-    if (!data) return res.status(404).json({ message: "No active rule found" });
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     if (error) throw error;
+
+    if (!data) return res.status(404).json({ message: "No active rule found" });
 
     return res.status(200).json(data);
   } catch (error) {

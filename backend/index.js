@@ -20,9 +20,19 @@ const port = 4001;
 app.use(express.json());
 app.use(cors());
 
+// Logger middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.originalUrl} ${res.statusCode} (${duration}ms)`);
+  });
+  next();
+});
+
 app.use("/api/rule", ruleRoutes);
-app.use('/api/ai', intelligenceRoutes);
-app.use("api/people", peopleRoutes)
+app.use("/api/ai", intelligenceRoutes);
+app.use("/api/people", peopleRoutes);
 
 app.listen(port, async () => {
   try {
