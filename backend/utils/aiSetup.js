@@ -3,10 +3,11 @@ const { GoogleGenAI } = require("@google/genai");
 const Gemini = new GoogleGenAI({});
 
 const generateSubConditions = (ruleText) => {
+  console.log("[DEBUG] Generating sub-conditions for rule: ", ruleText);
   return Gemini.interactions.create({
     model: "gemini-3.8-flash",
     input: `Classify this security rule into sub-conditions. Each sub-condition
-must be a self-cxontained, independently-checkable clause — do not split a
+must be a self-contained, independently-checkable clause — do not split a
 single clause into separate words (e.g. "wearing a mask" is one condition,
 not "wearing" and "mask" separately).
 

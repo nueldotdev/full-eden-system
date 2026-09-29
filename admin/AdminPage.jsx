@@ -113,13 +113,13 @@ export default function EdenVisionDashboard() {
     try {
       setUpdating(true);
 
-      const response = await fetch("http://localhost:4001/create_rule", {
+      const response = await fetch("http://localhost:4001/api/rule/create_rule", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          rule,
+          rule_text: rule
         }),
       });
 
