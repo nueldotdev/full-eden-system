@@ -406,7 +406,7 @@ export default function EdenVisionDashboard() {
           </section>
 
           {/* ---------------- Live camera preview ---------------- */}
-          <section className="eden-card">
+          {/* <section className="eden-card">
             <div className="eden-section-header-row">
               <div className="eden-section-header-left">
                 <span className="eden-live-dot-small" />
@@ -447,10 +447,10 @@ export default function EdenVisionDashboard() {
                 ⤢ Inspect
               </button>
             </div>
-          </section>
+          </section> */}
 
           {/* ---------------- Incident feed ---------------- */}
-          <section className="eden-feed-section">
+          {/* <section className="eden-feed-section">
             <div className="eden-feed-header-row">
               <div className="eden-section-header-left">
                 <span className="eden-pulse-dot-outer">
@@ -566,7 +566,7 @@ export default function EdenVisionDashboard() {
                 ))}
               </div>
             )}
-          </section>
+          </section> */}
         </div>
       </main>
 
